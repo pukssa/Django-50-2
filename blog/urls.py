@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from posts.views import test_view,  post_list_view, home_page_view
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('test/', test_view),
     path('', home_page_view),
     path('posts/', post_list_view),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
