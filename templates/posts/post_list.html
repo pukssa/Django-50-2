@@ -1,23 +1,23 @@
-{% extends 'base.html' %}
+{% extends "main.html" %}
 {% load static %}
-<body>
-        {%block content%}
-        {%for post in posts%}
+{%block content%}
+<form method="get" enctype="multipart/form-data" action="/posts/">
+  {{ form.as_p }}
+  <button type="submit">Search</button>
+</form>
+{% for post in posts %}
     <div class="card" style="width: 18rem;">
-        {% if post.img %}
-      <img src="{{post.image.url}}" class="card-img-top" alt="...">
-        {%else%}
-        <img src="{% static 'placeholder.png' %}" class="card-img-top" alt="...">
-        {% endif %}
-      <div class="card-body">
-        <h5 class="card-title">{{post.title}}</h5>
-        <p class="card-text">{{post.content}}</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-      </div>
-    </div>
- {%endfor%}
+{% if post.image %}
+  <img src="{{post.image.url}}" class="card-img-top" alt="...">
+  {% else %}
+  <img src="{static 'placeholder.jpg'" class="card-img-top" alt="...">
+  {%endif%}
+  <div class="card-body">
+    <h5 class="card-title">{{post.title}}</h5>
+    <p class="card-text">{{post.content}}</p>
+    <p class="card-text">Rate:{{post.rate}}</p>
+    <a href="/posts/{{post.id}}" class="btn btn-primary">Go somewhere</a>
+  </div>
+</div>
+{% endfor %}
 {%endblock%}
-</body>
-<footer>
-
-</footer>
