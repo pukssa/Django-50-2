@@ -1,18 +1,34 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from random import randint
-
+from django.shortcuts import render, HttpResponse
+import random
+from .forms import PostCreateForm
+import posts
 from posts.models import Post
+from django.shortcuts import redirect
 
 
 def test_view(request):
-    return HttpResponse(f"Hello, world.{randint(1, 100)}")
+    return HttpResponse(f"twinkling watermelon {random.randint(1, 100)}")
 
-def home_page_view(request):
-    return render(request, "base.html")
+def html_view(request):
+    return render(request,"main.html")
 
 def post_list_view(request):
-    posts = Post.objects.all()
-    return render(request, "post_list.html", context={"posts": posts})
+    post = (Post.objects.all())
+    print(posts)
+    return render(request,"posts/post_list.html",{"posts":post})
 
-# Create your views here.
+def post_detail_view(request, post_id):
+    post = Post.objects.get(id=post_id)
+    return render(request,"posts/post_detail.html", {"posts":post})
+
+def create_post_view(request):
+    if request.method == "GET":
+        form = PostCreateForm(request.POST)
+        return render(request,"posts/create_post.html",{"form":form})
+    elif request.method == "POST":
+        form = PostCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect ('/posts/')
+        else:
+            return render(request,"posts/create_post.html",{"form":form})
