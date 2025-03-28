@@ -16,13 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from posts.views import test_view, html_view, post_list_view, post_detail_view, create_post_view
+from posts.views import test_view, html_view, post_list_view, post_detail_view, create_post_view, post_update_view, PostListView
+
 from django.conf.urls.static import static
 from django.conf import settings
-from users.views import register_view, login_view, logout_view
+from users.views import register_view, login_view, logout_view, profile_view
 
 
 urlpatterns = [
+    path('posts/class', PostListView.as_view(), name='post-list'),
     path('admin/', admin.site.urls),
     path("test/", test_view),
     path('', html_view),
@@ -32,6 +34,9 @@ urlpatterns = [
     path ('register/' , register_view, name='register'),
     path ('login/' , login_view, name='login'),
     path ('logout/' , logout_view, name='logout'),
+    path ('profile/' , profile_view, name='profile'),
+    path ('post/<int:post_id>/', post_update_view, name='post_update'),
+
 
 ]
 

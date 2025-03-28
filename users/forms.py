@@ -7,6 +7,8 @@ class RegistrationForm(forms.Form):
     username = forms.CharField(required=True)
     email = forms.EmailField()
     password = forms.CharField(max_length = 5)
+    avatar = forms.ImageField(required=True)
+    age = forms.IntegerField()
     password_confirm = forms.CharField(max_length=5)
 
 def clean(self):

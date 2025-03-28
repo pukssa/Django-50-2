@@ -2,12 +2,15 @@ from unicodedata import category
 
 from django.shortcuts import render, HttpResponse
 import random
-from .forms import PostCreateForm, SearchForm
+from .forms import PostCreateForm, SearchForm, PostUpdateForm
 import posts
 from posts.models import Post
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.views.generic import ListView, DetailView, CreateView
+
+
 
 
 def test_view(request):
@@ -17,6 +20,10 @@ def test_view(request):
 
 def html_view(request):
     return render(request,"main.html")
+
+
+
+
 
 
 
@@ -46,26 +53,33 @@ def post_list_view(request):
             tags = [int(tag) for tag in tags]
             posts = posts.filter(tag__in=tags)
 
-
         if ordering:
             posts = posts.order_by(ordering)
 
 
-        max_pages = posts.count() // limit
-        if round(max_pages) < limit:
-            max_pages = round(max_pages) + 1
+        max_pages = posts.count() / limit
+        if round(max_pages)  < max_pages:
+            max_pages = round(max_pages) +1
         else:
-            max_pages = round (max_pages)
+            max_pages = round(max_pages)
 
-        start = (page -1) * limit
-        end = page * limit
+        start = (page - 1) * limit
+        end = (page) * limit
         posts = posts[start:end]
-        context_data = (
-        "posts":posts,
-        'form': form,
-        "max_pages": range(1, max_pages + 1) )
-        return render(request, "post_list.html",context=context_data
+        return render (
+            request,
+            "posts/post_list.html",
+            context={"posts": posts, "form": form, "max_pages": range(1, max_pages + 1)},
         )
+
+
+
+class PostListView(ListView):
+    model = Post
+    template_name = "posts/post_list.html"
+    context_object_name = "posts"
+
+
 
 
 @login_required(login_url="/login/")
@@ -88,3 +102,29 @@ def create_post_view(request):
             return redirect ('/posts/')
         else:
             return render(request,"posts/create_post.html",{"form":form})
+
+
+
+@login_required(login_url="/login/")
+def post_update_view(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id, author=request.user)
+    except Post.DoesNotExist:
+        return HttpResponse("Post does not exist")
+    if request.method == "GET":
+        form = PostUpdateForm(instance=post)
+        return render(request,"posts/post_update.html",{"form":form})
+    if request.method == "POST":
+        form = PostUpdateForm(request.POST, request.FILES ,instance=post)
+        if not form.is_valid():
+            return render(request,"posts/post_update.html",{"form":form})
+        if form.is_valid():
+            form.save()
+            return redirect ('/profile/')
+        else:
+             return HttpResponse("Post does not edit")
+
+
+
+
+

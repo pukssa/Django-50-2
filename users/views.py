@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from users.forms import RegistrationForm, LoginForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from users.models import Profile
 
 
 def register_view(request):
@@ -18,7 +19,20 @@ def register_view(request):
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            User.objects.create_user(email=email, password=password, username=username)
+            avatar = form.cleaned_data['avatar']
+            age = form.cleaned_data['age']
+            if not User.objects.create_user(email=email, password=password, username=username):
+                user = User.objects.create_user(email=email, password=password, username=username)
+                if user:
+                    Profile.objects.create(user=user, age=age, avatar=avatar)
+
+                elif not user:
+                    form.add_error(None,"unknown error")
+                    return render(request, 'users/register.html', {'form': form})
+            else:
+                form.add_error(None,"user with given credentials already exists")
+                return render(request, 'users/register.html', {'form': form})
+
             return redirect('/login/')
 
 
@@ -44,6 +58,13 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('/')
+
+
+def profile_view (request):
+    if request.method == 'GET':
+        user = request.user
+        posts = user.posts.all()
+        return render(request, 'users/profile.html', {'user': user, 'posts': posts})
 
 
 
