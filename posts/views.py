@@ -4,6 +4,7 @@ from .forms import PostCreateForm
 import posts
 from posts.models import Post
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
 
 def test_view(request):
@@ -11,16 +12,16 @@ def test_view(request):
 
 def html_view(request):
     return render(request,"main.html")
-
+@login_required(login_url="/login/")
 def post_list_view(request):
     post = (Post.objects.all())
     print(posts)
     return render(request,"posts/post_list.html",{"posts":post})
-
+@login_required(login_url="/login/")
 def post_detail_view(request, post_id):
     post = Post.objects.get(id=post_id)
     return render(request,"posts/post_detail.html", {"posts":post})
-
+@login_required(login_url="/login/")
 def create_post_view(request):
     if request.method == "GET":
         form = PostCreateForm(request.POST)
